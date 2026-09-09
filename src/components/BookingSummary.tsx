@@ -1,18 +1,14 @@
 import React from 'react';
 import { BookingSummary as BookingSummaryType } from '../types/booking';
 import { EmptyState } from './EmptyState';
-import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface BookingSummaryProps {
   summary: BookingSummaryType;
-  onConfirm: () => void;
-  isConfirmed: boolean;
 }
 
 export const BookingSummary: React.FC<BookingSummaryProps> = ({
   summary,
-  onConfirm,
-  isConfirmed,
 }) => {
   const { selectedRoom, checkIn, checkOut, nights, pricePerNight, total, isValid } = summary;
 
@@ -92,25 +88,6 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
               </div>
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Primary Action Button */}
-      <div className="mt-6 pt-4 border-t border-slate-100">
-        {isConfirmed ? (
-          <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-md text-xs font-medium flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Selection verified! Ready for booking integration.</span>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={!isValid || !selectedRoom}
-            className="w-full py-2.5 px-4 bg-slate-900 text-white font-semibold text-sm rounded-md hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
-          >
-            Confirm Selection
-          </button>
         )}
       </div>
     </aside>

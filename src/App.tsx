@@ -7,10 +7,9 @@ import { ROOMS } from './data/rooms';
 import { DEMO_EXISTING_BOOKINGS } from './data/bookings';
 import { Room, BookingSummary as BookingSummaryType } from './types/booking';
 import { validateDates } from './logic/validation';
-import { getTodayString, addDaysISO } from './logic/dates';
+import { getTodayString } from './logic/dates';
 import { calculateNights, calculateTotal } from './logic/booking';
 import { isRoomAvailable, isRoomCapacitySufficient } from './logic/availability';
-import { Sparkles, RefreshCw } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Current date baseline for validation (local calendar day)
@@ -21,7 +20,6 @@ export const App: React.FC = () => {
   const [checkOut, setCheckOut] = useState<string>('');
   const [guestCount, setGuestCount] = useState<number>(2);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
 
   // Pure logic calculations
   const validation = validateDates(checkIn, checkOut, todayStr);
@@ -79,17 +77,14 @@ export const App: React.FC = () => {
   // Event Handlers
   const handleCheckInChange = (val: string) => {
     setCheckIn(val);
-    setIsConfirmed(false);
   };
 
   const handleCheckOutChange = (val: string) => {
     setCheckOut(val);
-    setIsConfirmed(false);
   };
 
   const handleGuestCountChange = (val: number) => {
     setGuestCount(val);
-    setIsConfirmed(false);
   };
 
   const handleSelectRoom = (room: Room) => {
@@ -104,28 +99,6 @@ export const App: React.FC = () => {
     } else {
       setSelectedRoom(room);
     }
-    setIsConfirmed(false);
-  };
-
-  const handleConfirm = () => {
-    if (summary.isValid) {
-      setIsConfirmed(true);
-    }
-  };
-
-  // Quick preset helper for rapid verification (today + 3 nights)
-  const handleLoadSampleDates = () => {
-    setCheckIn(todayStr);
-    setCheckOut(addDaysISO(todayStr, 3));
-    setIsConfirmed(false);
-  };
-
-  const handleReset = () => {
-    setCheckIn('');
-    setCheckOut('');
-    setGuestCount(2);
-    setSelectedRoom(null);
-    setIsConfirmed(false);
   };
 
   return (
@@ -133,32 +106,6 @@ export const App: React.FC = () => {
       <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Helper bar for quick testing / initial state toggle */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 px-4 py-2.5 rounded-lg text-xs">
-          <div className="flex items-center gap-2 text-slate-600">
-            <span className="font-semibold text-slate-900">Demo Testing Controls:</span>
-            <span>Current Date baseline set to {todayStr}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleLoadSampleDates}
-              className="inline-flex items-center gap-1 font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-              Set Sample Dates (3 nights)
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="inline-flex items-center gap-1 font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded transition-colors"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
-              Reset
-            </button>
-          </div>
-        </div>
-
         {/* Stay Details Section */}
         <StayDetails
           checkIn={checkIn}
@@ -185,11 +132,7 @@ export const App: React.FC = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <BookingSummary
-              summary={summary}
-              onConfirm={handleConfirm}
-              isConfirmed={isConfirmed}
-            />
+            <BookingSummary summary={summary} />
           </div>
         </div>
       </main>
