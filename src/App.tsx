@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { StayDetails } from './components/StayDetails';
 import { RoomList } from './components/RoomList';
@@ -28,8 +28,6 @@ export const App: React.FC = () => {
   const isDateSelectionValid = validation.isValid;
 
   const nights = isDateSelectionValid ? calculateNights(checkIn, checkOut) : 0;
-  const pricePerNight = selectedRoom ? selectedRoom.pricePerNight : 0;
-  const total = selectedRoom ? calculateTotal(nights, pricePerNight) : 0;
 
   // Selected room validity checks
   const isSelectedRoomAvailable = selectedRoom
@@ -40,19 +38,22 @@ export const App: React.FC = () => {
     ? isRoomCapacitySufficient(selectedRoom, guestCount)
     : false;
 
-  // Automatically deselect room if date or guest count changes make it invalid
-  useEffect(() => {
-    if (selectedRoom) {
-      if (!isDateSelectionValid || !isSelectedRoomAvailable || !isSelectedRoomCapacityValid) {
-        setSelectedRoom(null);
-        setIsConfirmed(false);
-      }
-    }
-  }, [checkIn, checkOut, guestCount, isDateSelectionValid, isSelectedRoomAvailable, isSelectedRoomCapacityValid, selectedRoom]);
+  // Derive the valid selection deterministically (no syncing effect):
+  // a room only counts as selected while dates, availability, and capacity all hold.
+  const effectiveSelectedRoom =
+    selectedRoom &&
+    isDateSelectionValid &&
+    isSelectedRoomAvailable &&
+    isSelectedRoomCapacityValid
+      ? selectedRoom
+      : null;
+
+  const pricePerNight = effectiveSelectedRoom ? effectiveSelectedRoom.pricePerNight : 0;
+  const total = effectiveSelectedRoom ? calculateTotal(nights, pricePerNight) : 0;
 
   // Booking summary contract
   const summary: BookingSummaryType = {
-    selectedRoom,
+    selectedRoom: effectiveSelectedRoom,
     checkIn,
     checkOut,
     nights,
@@ -60,7 +61,7 @@ export const App: React.FC = () => {
     total,
     isValid:
       isDateSelectionValid &&
-      Boolean(selectedRoom) &&
+      Boolean(effectiveSelectedRoom) &&
       isSelectedRoomAvailable &&
       isSelectedRoomCapacityValid &&
       total > 0,
@@ -98,7 +99,7 @@ export const App: React.FC = () => {
     const capacity = checkCapacity(room);
     if (!available || !capacity) return;
 
-    if (selectedRoom?.code === room.code) {
+    if (effectiveSelectedRoom?.code === room.code) {
       setSelectedRoom(null);
     } else {
       setSelectedRoom(room);
@@ -175,7 +176,7 @@ export const App: React.FC = () => {
           <div className="lg:col-span-2">
             <RoomList
               rooms={ROOMS}
-              selectedRoom={selectedRoom}
+              selectedRoom={effectiveSelectedRoom}
               onSelectRoom={handleSelectRoom}
               isDateSelectionValid={isDateSelectionValid}
               checkAvailability={checkAvailability}
