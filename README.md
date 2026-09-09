@@ -2,6 +2,9 @@
 
 A hotel room booking calculator built for the Raintech Software Limited coding assessment: pick check-in/check-out dates, choose one room, and see the nights and total price with clear validation and error handling.
 
+## Live Demo
+[Open the live application](https://hotel-roombooking.vercel.app/)
+
 ## Stack
 
 - React
