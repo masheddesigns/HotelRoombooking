@@ -1,4 +1,5 @@
 import { ValidationResult } from '../types/booking';
+import { getTodayString } from './dates';
 
 /**
  * Validates check-in and check-out dates according to strict precedence rules:
@@ -10,7 +11,7 @@ import { ValidationResult } from '../types/booking';
 export function validateDates(
   checkIn: string,
   checkOut: string,
-  today: string = new Date().toISOString().split('T')[0]
+  today: string = getTodayString()
 ): ValidationResult {
   // 1. Missing Check-in
   if (!checkIn) {

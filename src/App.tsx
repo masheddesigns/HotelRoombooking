@@ -7,13 +7,14 @@ import { ROOMS } from './data/rooms';
 import { DEMO_EXISTING_BOOKINGS } from './data/bookings';
 import { Room, BookingSummary as BookingSummaryType } from './types/booking';
 import { validateDates } from './logic/validation';
+import { getTodayString, addDaysISO } from './logic/dates';
 import { calculateNights, calculateTotal } from './logic/booking';
 import { isRoomAvailable, isRoomCapacitySufficient } from './logic/availability';
 import { Sparkles, RefreshCw } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Current date baseline for validation
-  const todayStr = '2026-09-10';
+  // Current date baseline for validation (local calendar day)
+  const todayStr = getTodayString();
 
   // UI States
   const [checkIn, setCheckIn] = useState<string>('');
@@ -91,7 +92,8 @@ export const App: React.FC = () => {
   };
 
   const handleSelectRoom = (room: Room) => {
-    // Guard against selecting unavailable or over-capacity rooms
+    // Guard against selecting without valid dates, or unavailable/over-capacity rooms
+    if (!isDateSelectionValid) return;
     const available = checkAvailability(room.code);
     const capacity = checkCapacity(room);
     if (!available || !capacity) return;
@@ -110,10 +112,10 @@ export const App: React.FC = () => {
     }
   };
 
-  // Quick preset helper for rapid verification
+  // Quick preset helper for rapid verification (today + 3 nights)
   const handleLoadSampleDates = () => {
-    setCheckIn('2026-09-10');
-    setCheckOut('2026-09-13');
+    setCheckIn(todayStr);
+    setCheckOut(addDaysISO(todayStr, 3));
     setIsConfirmed(false);
   };
 
@@ -143,7 +145,7 @@ export const App: React.FC = () => {
               className="inline-flex items-center gap-1 font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-              Set Sample Dates (Sep 10–13)
+              Set Sample Dates (3 nights)
             </button>
             <button
               type="button"
